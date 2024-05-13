@@ -8,6 +8,10 @@ use Platformsh\ConfigReader\Config;
 
 mapPlatformShEnvironment();
 
+if (!defined('ENV_PRE')) {
+    define("ENV_PRE", 'PLATFORM_');
+}
+
 /**
  * Map Platform.Sh environment variables to the values Laravel expects.
  *
