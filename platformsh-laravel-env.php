@@ -19,8 +19,8 @@ function mapPlatformShEnvironment(): void
 {
     $envPrefix = 'PLATFORM_';
 
-    if (defined('ENV_PRE_CUST')) {
-        $envPrefix = ENV_PRE_CUST;
+    if (getenv('CONFIG_PRE')) {
+        $envPrefix = getenv('CONFIG_PRE');
     }
     echo $envPrefix;
     $config = new Config(null, $envPrefix);
