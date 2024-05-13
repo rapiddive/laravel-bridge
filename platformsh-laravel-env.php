@@ -20,7 +20,7 @@ if (!defined('ENV_PRE')) {
  */
 function mapPlatformShEnvironment() : void
 {
-    $config = new Config();
+    $config = new Config(null, static::ENV_PRE);
 
     if (!$config->inRuntime()) {
         return;
