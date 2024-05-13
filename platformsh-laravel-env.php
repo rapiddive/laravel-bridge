@@ -22,7 +22,6 @@ function mapPlatformShEnvironment(): void
     if (getenv('CONFIG_PRE')) {
         $envPrefix = getenv('CONFIG_PRE');
     }
-    echo $envPrefix;
     $config = new Config(null, $envPrefix);
 
     if (!$config->inRuntime()) {
