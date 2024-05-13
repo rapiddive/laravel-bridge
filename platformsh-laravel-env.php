@@ -7,12 +7,6 @@ namespace Platformsh\LaravelBridge;
 use Platformsh\ConfigReader\Config;
 use RuntimeException;
 
-$envPrefix = 'PLATFORM_';
-
-if (defined('ENV_PRE_CUST')) {
-    $envPrefix = ENV_PRE_CUST;
-}
-
 mapPlatformShEnvironment();
 
 /**
@@ -23,7 +17,11 @@ mapPlatformShEnvironment();
  */
 function mapPlatformShEnvironment(): void
 {
-    global $envPrefix;
+    $envPrefix = 'PLATFORM_';
+
+    if (defined('ENV_PRE_CUST')) {
+        $envPrefix = ENV_PRE_CUST;
+    }
     $config = new Config(null, $envPrefix);
 
     if (!$config->inRuntime()) {
