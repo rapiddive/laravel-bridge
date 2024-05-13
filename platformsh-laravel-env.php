@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Platformsh\LaravelBridge;
 
 use Platformsh\ConfigReader\Config;
+use RuntimeException;
+
+$envPrefix = 'PLATFORM_';
+
+if (defined('ENV_PRE_CUST')) {
+    $envPrefix = ENV_PRE_CUST;
+}
 
 mapPlatformShEnvironment();
-
-if (!defined('ENV_PRE')) {
-    define("ENV_PRE", 'PLATFORM_');
-}
 
 /**
  * Map Platform.Sh environment variables to the values Laravel expects.
@@ -18,9 +21,10 @@ if (!defined('ENV_PRE')) {
  * This is wrapped up into a function to avoid executing code in the global
  * namespace.
  */
-function mapPlatformShEnvironment() : void
+function mapPlatformShEnvironment(): void
 {
-    $config = new Config(null, static::ENV_PRE);
+    global $envPrefix;
+    $config = new Config(null, $envPrefix);
 
     if (!$config->inRuntime()) {
         return;
@@ -60,10 +64,10 @@ function mapPlatformShEnvironment() : void
  * @param mixed $value
  *   The value to set.  Null to unset it.
  */
-function setEnvVar(string $name, $value = null) : void
+function setEnvVar(string $name, $value = null): void
 {
     if (!putenv("$name=$value")) {
-        throw new \RuntimeException('Failed to create environment variable: ' . $name);
+        throw new RuntimeException('Failed to create environment variable: ' . $name);
     }
     $order = ini_get('variables_order');
     if (stripos($order, 'e') !== false) {
@@ -71,13 +75,13 @@ function setEnvVar(string $name, $value = null) : void
     }
     if (stripos($order, 's') !== false) {
         if (strpos($name, 'HTTP_') !== false) {
-            throw new \RuntimeException('Refusing to add ambiguous environment variable ' . $name . ' to $_SERVER');
+            throw new RuntimeException('Refusing to add ambiguous environment variable ' . $name . ' to $_SERVER');
         }
         $_SERVER[$name] = $value;
     }
 }
 
-function mapAppUrl(Config $config) : void
+function mapAppUrl(Config $config): void
 {
     // If the APP_URL is already set, leave it be.
     if (getenv('APP_URL')) {
@@ -114,7 +118,7 @@ function mapAppUrl(Config $config) : void
     setEnvVar('APP_URL', reset($routes)['url'] ?: null);
 }
 
-function mapPlatformShDatabase(string $relationshipName, Config $config) : void
+function mapPlatformShDatabase(string $relationshipName, Config $config): void
 {
     if (!$config->hasRelationship($relationshipName)) {
         return;
@@ -130,7 +134,7 @@ function mapPlatformShDatabase(string $relationshipName, Config $config) : void
     setEnvVar('DB_PASSWORD', $credentials['password']);
 }
 
-function mapPlatformShRedisCache(string $relationshipName, Config $config) : void
+function mapPlatformShRedisCache(string $relationshipName, Config $config): void
 {
     if (!$config->hasRelationship($relationshipName)) {
         return;
@@ -144,7 +148,7 @@ function mapPlatformShRedisCache(string $relationshipName, Config $config) : voi
     setEnvVar('REDIS_PORT', $credentials['port']);
 }
 
-function mapPlatformShRedisSession(string $relationshipName, Config $config) : void
+function mapPlatformShRedisSession(string $relationshipName, Config $config): void
 {
     if (!$config->hasRelationship($relationshipName)) {
         return;
@@ -158,7 +162,7 @@ function mapPlatformShRedisSession(string $relationshipName, Config $config) : v
     setEnvVar('REDIS_PORT', $credentials['port']);
 }
 
-function mapPlatformShMail(Config $config) : void
+function mapPlatformShMail(Config $config): void
 {
     if (empty($config->smtpHost)) {
         return;
